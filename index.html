@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iClone 8 Field Guide</title>
+<style>
+:root{
+  --bg:#0f1115;--panel:#171a21;--card:#1d212a;--line:#2a2f3a;--text:#e8e6e1;--dim:#9aa0ab;
+  --accent:#8bc34a;--accent2:#f2b84b;--blue:#5aa9e6;--done:#3d5a2a;
+}
+body.light{--bg:#f5f3ee;--panel:#ebe8e1;--card:#fff;--line:#d9d5cc;--text:#1f2228;--dim:#6b6f78;--done:#e3f0d6}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font:15px/1.55 "Segoe UI",system-ui,sans-serif;display:flex;flex-direction:column}
+header{display:flex;gap:14px;align-items:center;padding:12px 18px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+header h1{font-size:18px;margin:0;white-space:nowrap}
+header h1 span{color:var(--accent)}
+#search{flex:1;min-width:200px;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:15px}
+.chip{padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer;font-size:13px}
+.chip.on{border-color:var(--accent);color:var(--accent)}
+.progress{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--dim);white-space:nowrap}
+.bar{width:120px;height:8px;background:var(--line);border-radius:9px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+main{flex:1;display:flex;min-height:0}
+nav{width:230px;flex:none;overflow:auto;padding:10px;border-right:1px solid var(--line);background:var(--panel)}
+nav a{display:flex;justify-content:space-between;gap:6px;padding:7px 10px;border-radius:7px;color:var(--text);text-decoration:none;font-size:14px;cursor:pointer}
+nav a:hover,nav a.on{background:var(--card)}
+nav a small{color:var(--dim)}
+#content{flex:1;overflow:auto;padding:18px 22px 60px}
+.intro{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:18px;color:var(--dim)}
+.intro b{color:var(--text)}
+h2.cat{margin:26px 0 10px;font-size:19px;display:flex;gap:8px;align-items:center}
+h2.cat small{font-weight:normal;color:var(--dim);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:7px}
+.card.done{background:var(--done)}
+.top{display:flex;gap:10px;align-items:flex-start}
+.ico{font-size:24px;line-height:1}
+.ttl{flex:1}
+.ttl h3{margin:0;font-size:16px}
+.where{font-size:12px;color:var(--blue);font-family:Consolas,monospace}
+.lvl{font-size:11px;padding:2px 7px;border-radius:6px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+.lvl.Beginner{color:var(--accent);border-color:var(--accent)}
+.lvl.Intermediate{color:var(--accent2);border-color:var(--accent2)}
+.lvl.Advanced{color:#e57373;border-color:#e57373}
+.short{margin:0}
+.btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.btns button,.btns a{font-size:13px;padding:5px 10px;border-radius:7px;border:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer;text-decoration:none}
+.btns button:hover,.btns a:hover{border-color:var(--accent)}
+.btns .yt{color:#ff6b6b}
+.btns label{margin-left:auto;font-size:13px;color:var(--dim);display:flex;align-items:center;gap:5px;cursor:pointer}
+.more,.try{display:none;border-top:1px dashed var(--line);padding-top:8px;font-size:14px}
+.more.open,.try.open{display:block}
+.ex{background:rgba(242,184,75,.1);border-left:3px solid var(--accent2);padding:6px 10px;border-radius:0 8px 8px 0;margin-top:6px}
+.try ol{margin:4px 0 0;padding-left:20px}
+.try li{margin:3px 0;cursor:pointer}
+.try li.ok{text-decoration:line-through;color:var(--dim)}
+.try .goal{color:var(--accent);font-weight:600}
+.empty{color:var(--dim);padding:30px;text-align:center}
+kbd{background:var(--line);border-radius:4px;padding:0 5px;font-size:12px}
+@media(max-width:800px){nav{display:none}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎬 iClone 8 <span>Field Guide</span></h1>
+  <input id="search" placeholder="Search any feature… (press / )" autocomplete="off">
+  <button class="chip on" data-f="all">All</button>
+  <button class="chip" data-f="Beginner">Beginner</button>
+  <button class="chip" data-f="Intermediate">Intermediate</button>
+  <button class="chip" data-f="Advanced">Advanced</button>
+  <button class="chip" data-f="todo">Not done</button>
+  <div class="progress"><div class="bar"><i id="barfill"></i></div><span id="ptext"></span></div>
+  <button class="chip" id="theme" title="Light / dark">🌓</button>
+</header>
+<main>
+  <nav id="nav"></nav>
+  <section id="content"></section>
+</main>
+
+<script>
+/* Each entry: cat, icon, title, where, level, short, more, ex, try[], yt(search words)
+   Menu names can differ a little between iClone 8.x updates. */
+const CATS = [
+ ["start","🧭","Interface & Navigation"],
+ ["project","💾","Project, Import & Export"],
+ ["char","🧍","Characters"],
+ ["body","🏃","Body Animation"],
+ ["face","😀","Face & Lip Sync"],
+ ["mocap","🎥","Mocap & AI Tools"],
+ ["time","⏱️","Timeline & Keys"],
+ ["cam","📷","Cameras"],
+ ["light","💡","Lighting & Look"],
+ ["scene","🏞️","Props, Sets & Nature"],
+ ["fx","🔥","Physics & Effects"],
+ ["render","🖼️","Rendering & Output"],
+ ["pipe","🔌","Plugins, Python & Pipeline"]
+];
+
+const F = [
+/* ---------------- Interface ---------------- */
+{cat:"start",icon:"🗺️",title:"The four side tabs",where:"Right edge: Content · Scene · Visual · Modify (+ Render)",level:"Beginner",
+ short:"Everything in iClone lives in four tabs on the right edge.",
+ more:"<b>Content</b> = the library (drag things in). <b>Scene</b> = list of everything in your scene. <b>Visual</b> = lights, sky, post effects. <b>Modify</b> = settings of whatever is selected. <b>Render</b> = output video/images.",
+ ex:"Think of a kitchen: Content is the fridge, Scene is the counter, Modify is the knife you're using right now, Visual is the kitchen lighting.",
+ try:["Click each tab once and read its header.","Select the floor, then open Modify – notice the panel changes.","Select a light – Modify changes again."],
+ yt:"iClone 8 interface beginner overview"},
+{cat:"start",icon:"🖱️",title:"Viewport navigation",where:"Viewport + camera buttons on the toolbar",level:"Beginner",
+ short:"Orbit, pan and zoom around the scene.",
+ more:"Use the mouse (right / middle button drag and wheel) or the orbit / pan / zoom tool buttons. 'Pick target' style buttons frame the selected object. Navigating the viewport does NOT move the render camera unless you are looking through it.",
+ ex:"Walk around Bappa like a sculptor walks around clay — the viewer's eye moves, the statue doesn't.",
+ try:["Load any character.","Orbit around her, zoom into the face, pan to the feet.","Use the frame/zoom-to-selected button to snap back."],
+ yt:"iClone 8 viewport navigation camera controls"},
+{cat:"start",icon:"🧩",title:"Transform gizmo (move / rotate / scale)",where:"Toolbar: select · move · rotate · scale",level:"Beginner",
+ short:"Arrows to move, rings to rotate, boxes to scale.",
+ more:"Pick a tool, drag the coloured axis (X red, Y green, Z blue). Exact numbers go in Modify → Transform. Local vs world space toggle changes which way the arrows point.",
+ ex:"Placing a modak plate exactly in Bappa's hand: move roughly with the gizmo, then type exact numbers in Modify.",
+ try:["Add a box from Content → Props → 3D Blocks.","Move it 2 m up using Modify → Transform (200 cm).","Rotate it 45° on Z and scale it to 150%."],
+ yt:"iClone 8 transform gizmo move rotate scale"},
+{cat:"start",icon:"⚡",title:"Preview quality & Quick Mode",where:"Toolbar dropdowns: Preview / Quick Mode / High Quality",level:"Beginner",
+ short:"Trade viewport beauty for speed.",
+ more:"Quick/Preview modes simplify shading so playback stays smooth. Switch to High Quality to judge materials, hair and lighting. This doesn't change the final render settings.",
+ ex:"Like drafting a drawing in pencil (fast) before inking (pretty).",
+ try:["Play an animation in Quick Mode, note the smoothness.","Switch to High Quality and compare skin and shadows."],
+ yt:"iClone 8 viewport quality settings performance"},
+{cat:"start",icon:"▶️",title:"Realtime vs By-frame playback",where:"Play bar: Realtime / By Frame",level:"Beginner",
+ short:"Realtime skips frames to keep speed; By Frame shows every frame.",
+ more:"Realtime = true speed, may drop frames on heavy scenes (good for timing). By Frame = every frame, may play slow (good for checking physics, springs, fast action).",
+ ex:"Checking a kick's timing → Realtime. Checking if the foot clips through the floor → By Frame.",
+ try:["Play a scene in Realtime, then in By Frame, and compare."],
+ yt:"iClone realtime vs by frame playback"},
+{cat:"start",icon:"🗂️",title:"Scene Manager",where:"Scene tab",level:"Beginner",
+ short:"Tree list of everything: hide, lock, select, group.",
+ more:"Toggle visibility (eye), lock objects so you don't move them by accident, and select things that are hard to click (lights, small props). Groups keep big sets tidy.",
+ ex:"Hiding Bappa's mouse vahana while you animate his hands, then bringing it back.",
+ try:["Open Scene tab.","Hide the floor, then show it.","Lock the character and try to drag it in the viewport."],
+ yt:"iClone 8 scene manager hide lock group"},
+{cat:"start",icon:"📚",title:"Content Manager (library)",where:"Content tab → Template / Custom / Packages",level:"Beginner",
+ short:"Your library: characters, motions, props, lights, sets.",
+ more:"<b>Template</b> = built-in content. <b>Custom</b> = things you saved. Drag items onto the viewport or onto a character (motions, accessories). Right-click to add to Custom or open the folder.",
+ ex:"Saving your finished Bappa as a custom character so every new project starts with one drag.",
+ try:["Browse Content → Template → Motion.","Drag a motion onto a character.","Save something into Custom (right-click → Add to Custom)."],
+ yt:"iClone 8 content manager custom template"},
+{cat:"start",icon:"🧲",title:"Snap, align & pivot",where:"Toolbar align/snap + Modify → Transform / Pivot",level:"Intermediate",
+ short:"Drop things on the ground and line them up neatly.",
+ more:"'Drop to ground' puts an object on the floor. Align tools line up several props. Editing the pivot changes the point an object rotates around.",
+ ex:"A door rotates from its hinge, not its centre — move the pivot to the hinge edge.",
+ try:["Lift a prop in the air, then drop it to the ground.","Change a prop's pivot to one edge and rotate it."],
+ yt:"iClone 8 pivot edit align snap"},
+
+/* ---------------- Project ---------------- */
+{cat:"project",icon:"📁",title:"Project settings (FPS & length)",where:"Project / Timeline settings",level:"Beginner",
+ short:"Set frame rate and how long the scene is.",
+ more:"iClone defaults to 60 fps. For your 2D paint-over plan, render at 24 fps and paint every 2nd frame. Set the end frame so the timeline isn't longer than your shot.",
+ ex:"A 10-second shot at 24 fps = 240 frames.",
+ try:["Check your project's fps.","Set the timeline end to 240 frames for a 10-second shot at 24 fps."],
+ yt:"iClone 8 project settings fps timeline length"},
+{cat:"project",icon:"💾",title:"Save, Save As, Merge",where:"File menu",level:"Beginner",
+ short:".iProject saves the whole scene; Merge pulls another scene in.",
+ more:"Save often (Ctrl+S) and keep numbered versions (shot01_v01, v02…). Merge Project adds a saved scene (set, lights) into the current one.",
+ ex:"Build the temple set once, then merge it into every Bappa shot.",
+ try:["Save as shot01_v01.","Make a change, save as shot01_v02.","Open a new project and merge v01 into it."],
+ yt:"iClone 8 merge project save versions"},
+{cat:"project",icon:"📥",title:"Import (FBX, OBJ, iAvatar, iProp)",where:"File → Import",level:"Intermediate",
+ short:"Bring in models and animations from other software.",
+ more:"FBX/OBJ for props and rigged models; FBX motions can become iClone motions. Non-Reallusion rigged characters need <b>Characterization</b> (mapping their bones to iClone's) before they animate correctly.",
+ ex:"A Ganesha crown modelled in Blender → export FBX → import → attach to the head bone.",
+ try:["Import any small OBJ/FBX prop.","Check its scale and fix it in Modify → Transform."],
+ yt:"iClone 8 import fbx obj prop"},
+{cat:"project",icon:"🧬",title:"Characterization (non-CC characters)",where:"Opens when importing a rigged FBX character",level:"Advanced",
+ short:"Teach iClone which bone is the arm, leg, head…",
+ more:"Map each bone of a foreign skeleton to iClone's standard (HumanIK) one. After that, all iClone motions work on it. Extra bones can become 'extended bones' (for springs).",
+ ex:"A Mixamo or VRoid character: map bones once, then any iClone dance works on it.",
+ try:["Import a rigged FBX human (e.g. from Mixamo).","Follow the mapping steps.","Drag an iClone motion on it to test."],
+ yt:"iClone 8 characterization fbx character mixamo"},
+{cat:"project",icon:"📤",title:"Export FBX / USD",where:"File → Export",level:"Intermediate",
+ short:"Send animated characters and scenes to Blender, Unreal, Maya.",
+ more:"Export FBX with animation for other software (choose target presets like Blender/Unreal). USD is for Omniverse-style pipelines. For cloth sim in Blender: export the animated body, simulate there.",
+ ex:"Animate Bappa's dance in iClone → export FBX → Blender for dhoti cloth simulation.",
+ try:["Export a 5-second animated character as FBX with a Blender preset.","Open it in Blender and press play."],
+ yt:"iClone 8 export fbx to blender animation"},
+
+/* ---------------- Characters ---------------- */
+{cat:"char",icon:"🔁",title:"CC4 ↔ iClone round trip",where:"CC4: Send Character to iClone · iClone: Edit in Character Creator",level:"Beginner",
+ short:"Build in CC4, animate in iClone, go back to fix things.",
+ more:"Changes made in CC4 (morphs, clothes, springs) are sent back to replace the character in iClone, keeping its animation.",
+ ex:"Bappa's belly too big for a pose? Edit in CC4, send back — the dance stays.",
+ try:["Select a character in iClone → open it in CC4.","Change a body morph slightly.","Send it back and confirm the animation is kept."],
+ yt:"character creator 4 send to iclone 8 workflow"},
+{cat:"char",icon:"🎚️",title:"Modify → Attribute",where:"Modify panel → first tab",level:"Beginner",
+ short:"Name, transform, visibility, shadows for the selected object.",
+ more:"Rename objects (makes Scene Manager readable), set exact position, cast/receive shadow toggles, and per-object settings.",
+ ex:"Name things clearly: 'Bappa', 'Mouse_Vahana', 'Temple_Floor'.",
+ try:["Rename your character.","Turn off 'cast shadow' on it and see the difference."],
+ yt:"iClone 8 modify panel attribute"},
+{cat:"char",icon:"🎨",title:"Materials & textures",where:"Modify → Material tab (checker icon)",level:"Intermediate",
+ short:"Change colour, textures, shine, skin shaders.",
+ more:"Pick a mesh/material, then edit Diffuse (colour), Normal (bumps), Roughness (shine), Opacity, Emission (glow). Digital Human shaders handle skin, eyes, hair, teeth.",
+ ex:"Give Bappa's crown a golden metallic look and a soft glow on the jewels.",
+ try:["Select a prop, open Material.","Change its diffuse colour.","Raise Metallic and lower Roughness for a gold look."],
+ yt:"iClone 8 material editing pbr tutorial"},
+{cat:"char",icon:"🧷",title:"Attach props to a character",where:"Modify → Attribute → Attach (Link)",level:"Beginner",
+ short:"Make a prop follow a hand, head, or any bone.",
+ more:"Attach (link) a prop to a bone; it follows that bone's animation. Detach at a frame to drop it.",
+ ex:"Modak in Bappa's right hand, axe in the left — both follow the arms.",
+ try:["Add a ball prop.","Attach it to the character's right hand.","Play a motion — the ball moves with the hand."],
+ yt:"iClone 8 attach prop to hand"},
+{cat:"char",icon:"🌀",title:"Spring (secondary bounce)",where:"Modify → Spring section",level:"Intermediate",
+ short:"Automatic bounce for hair, ears, tails, accessories.",
+ more:"Springs are set up in CC4 (Edit Spring); in iClone you switch them On/Off and tune Mass, Strength, Bounciness. If springs don't work on body bones, use the Jiggle Baker plugin in this project.",
+ ex:"Bappa's ear flaps and trunk swinging after he turns his head.",
+ try:["Select a character with spring hair or accessories.","Turn spring On, play a jump motion, then change Bounciness."],
+ yt:"iClone 8 spring bones hair accessories"},
+{cat:"char",icon:"🦴",title:"HumanIK settings",where:"Modify panel → HumanIK Settings",level:"Advanced",
+ short:"Fine-tune how motions fit your character's body.",
+ more:"Hip offset and other body settings that are applied when a motion is retargeted. Useful when feet float or sink.",
+ ex:"A heavy character whose feet sink into the floor → adjust the hip offset.",
+ try:["Apply a walk.","Change Hip offset and watch the feet."],
+ yt:"iClone 8 humanik settings hip offset"},
+{cat:"char",icon:"🎭",title:"Persona (idle personality)",where:"Animation menu / character perform options",level:"Intermediate",
+ short:"Default idle, talk and walk styles for a character.",
+ more:"A persona bundles default motions so a character looks alive when not doing something specific (breathing idle, talking idle). Used by Motion Director too.",
+ ex:"Calm, divine idle for Bappa; nervous fidgeting for a side character.",
+ try:["Look up the Persona options for a character.","Switch personas and play an empty timeline."],
+ yt:"iClone persona idle motion character"},
+
+/* ---------------- Body animation ---------------- */
+{cat:"body",icon:"🕺",title:"Apply motions from the library",where:"Content → Motion → drag onto character",level:"Beginner",
+ short:"Drag a motion onto a character to animate it instantly.",
+ more:"Each motion becomes a clip on the Motion track. Drop several in a row; iClone blends between them.",
+ ex:"Walk in → stop → namaste → sit. Four clips, done in a minute.",
+ try:["Drag a walk motion onto a character.","Drag an idle after it on the timeline.","Play and watch the blend."],
+ yt:"iClone 8 apply motion library beginner"},
+{cat:"body",icon:"✂️",title:"Motion clip editing",where:"Timeline → Motion track → right-click clip",level:"Beginner",
+ short:"Trim, loop, speed up, break and blend clips.",
+ more:"Drag clip ends to trim, hold a key while dragging to loop (or use the loop option), change speed, Break a clip in two, and adjust the transition between clips.",
+ ex:"Make a 2-second clap last 10 seconds by looping it 5 times.",
+ try:["Loop a short motion 3 times.","Make it 50% slower.","Break it in the middle and delete the second half."],
+ yt:"iClone 8 motion clip loop speed break transition"},
+{cat:"body",icon:"🦾",title:"Edit Motion Layer (FK / IK)",where:"Modify → Motion tab (running figure) → Edit Motion Layer",level:"Intermediate",
+ short:"Pose any body part by hand, on top of existing motion.",
+ more:"<b>FK</b> rotates one bone at a time (arms swinging, spine curls). <b>IK</b> drags hands/feet and the chain follows. Each change makes a key on the motion layer; the original clip stays untouched. Extra bones (breast, trunk, accessories) are not in the picker — they need a plugin.",
+ ex:"The walk is fine but Bappa should raise his right hand in blessing — add a layer key on the arm.",
+ try:["Apply any motion.","Open Edit Motion Layer, choose FK.","At frame 30 raise the right arm; at frame 60 lower it. Play."],
+ yt:"iClone 8 edit motion layer fk ik tutorial"},
+{cat:"body",icon:"🎯",title:"Reach Target & Lock",where:"Edit Motion Layer panel",level:"Intermediate",
+ short:"Glue hands or feet to an object or spot.",
+ more:"Reach Target makes a hand/foot follow a prop. Lock pins it in place so the body can move while the hand stays.",
+ ex:"Bappa's hand stays on his belly while he laughs and rocks.",
+ try:["Put a prop near the character.","Use Reach Target to make the hand touch it over 1 second."],
+ yt:"iClone 8 reach target lock hand"},
+{cat:"body",icon:"👀",title:"Look At",where:"Animation / Modify → Look At",level:"Beginner",
+ short:"Head and eyes automatically follow a target.",
+ more:"Pick a camera or object as target; the head and eyes track it. Great for eye contact with the audience.",
+ ex:"Bappa's eyes follow the camera as it circles him — very powerful for devotional shots.",
+ try:["Set Look At target to the camera.","Move the camera around and play."],
+ yt:"iClone 8 look at camera eyes"},
+{cat:"body",icon:"🧭",title:"Motion Director (game-style control)",where:"Toolbar MD icon / Modify → MD tab",level:"Intermediate",
+ short:"Drive characters with keyboard/mouse like a game, and it records.",
+ more:"WASD-style control, with walk/run/turn motions picked automatically. MD Props trigger actions (sit on bench, open door). Great for crowds and blocking.",
+ ex:"Walk Bappa through the temple courtyard live, like playing a game, then refine.",
+ try:["Enable Motion Director on a character.","Record a short walk around the scene with the keyboard."],
+ yt:"iClone 8 motion director tutorial"},
+{cat:"body",icon:"🛤️",title:"Motion Planning & paths",where:"Toolbar: MOTION PLANNING / Animation → Path",level:"Intermediate",
+ short:"Draw a path, the character walks it.",
+ more:"Create a path and let the character follow it with walk/run motions; foot timing is handled for you. Good for long walks without sliding feet.",
+ ex:"A procession: draw a curvy path around the pandal, Bappa's devotees walk along it.",
+ try:["Create a path on the floor.","Make a character follow it and play."],
+ yt:"iClone 8 motion planning path walk"},
+{cat:"body",icon:"🦶",title:"Motion correction (foot contact)",where:"Motion clip / Edit Motion Layer correction options",level:"Advanced",
+ short:"Stop feet sliding and floating.",
+ more:"Detects when feet should be planted and fixes sliding — especially after blending clips or using mocap.",
+ ex:"After blending a walk into a stop, the left foot skates — correction pins it.",
+ try:["Blend two motions so a foot slides.","Use the foot correction option and compare."],
+ yt:"iClone 8 foot sliding fix motion correction"},
+{cat:"body",icon:"📐",title:"Motion retargeting (fit motion to body)",where:"Right-click motion clip (retarget options)",level:"Advanced",
+ short:"Widen arms/legs so motions fit heavy or stylised bodies.",
+ more:"Offsets and angle tweaks for arms and legs over a whole clip. The first fix for hands going through a big belly.",
+ ex:"Bappa's hands pass through his belly in a dance → push arms outward for the clip.",
+ try:["Apply a motion to a heavy character.","Increase the arm offset until hands clear the body."],
+ yt:"iClone motion retarget arm offset"},
+{cat:"body",icon:"🧘",title:"AccuPOSE",where:"Toolbar: AccuPOSE",level:"Intermediate",
+ short:"Smart posing: drag a few points, the body arranges itself naturally.",
+ more:"An AI-assisted posing tool with pose libraries; adjust hands, feet and body with fewer clicks than pure FK/IK.",
+ ex:"Quickly pose Bappa in a classic seated lalitasana pose.",
+ try:["Open AccuPOSE on a character.","Pick a pose and adjust one hand."],
+ yt:"iClone AccuPOSE tutorial"},
+{cat:"body",icon:"🎈",title:"Motion Puppet",where:"Animation → Motion Puppet",level:"Intermediate",
+ short:"Perform body motion with the mouse in real time.",
+ more:"Choose a body-part preset (e.g. arms), move the mouse while recording — it creates animation. Good for organic, quick actions.",
+ ex:"Make a side character wave excitedly by 'puppeting' the arm with the mouse.",
+ try:["Open Motion Puppet.","Record 3 seconds of arm motion with the mouse."],
+ yt:"iClone motion puppet mouse"},
+{cat:"body",icon:"🖐️",title:"Hand gestures & finger poses",where:"Content → Hand poses / Hand Gesture plugin",level:"Intermediate",
+ short:"Ready hand shapes and finger animation.",
+ more:"Apply hand poses (fist, point, mudra-like shapes) and blend them. Fingers can also be keyed in Edit Motion Layer (FK).",
+ ex:"Abhaya mudra (blessing hand) for Bappa: open palm, fingers up.",
+ try:["Apply a hand pose to the right hand.","Key fingers closing into a fist over 10 frames."],
+ yt:"iClone 8 hand gesture fingers animation"},
+
+/* ---------------- Face ---------------- */
+{cat:"face",icon:"🎙️",title:"Lip sync from audio",where:"Create Script / Animation → Lips (load audio or TTS)",level:"Beginner",
+ short:"Load a voice file; the mouth moves automatically.",
+ more:"Drop a WAV, iClone creates viseme (mouth-shape) keys. Text-to-speech can also generate a voice. Tweak strength and smoothing afterwards.",
+ ex:"Record 'Ganpati Bappa Morya!' on your phone, load it, the character says it.",
+ try:["Record a short line as WAV.","Load it as lip sync on a character.","Play and tweak strength."],
+ yt:"iClone 8 lip sync audio tutorial"},
+{cat:"face",icon:"🗣️",title:"AccuLips (text-aligned lip sync)",where:"Lip sync options (AccuLips)",level:"Intermediate",
+ short:"More accurate lip sync by giving it the script text.",
+ more:"You give the audio + the spoken text; it aligns words and visemes more precisely, and lets you edit words on the timeline.",
+ ex:"Long dialogue scenes where every syllable matters.",
+ try:["Load audio with AccuLips and paste the text.","Fix one word's timing on the timeline."],
+ yt:"iClone 8 AccuLips tutorial"},
+{cat:"face",icon:"😊",title:"Face Key (expressions)",where:"Modify → face tab / Animation → Face Key",level:"Beginner",
+ short:"Sliders and click-drag areas for brows, eyes, mouth, cheeks.",
+ more:"Pick a frame, set an expression with sliders or presets; it keys automatically. Layer expressions on top of lip sync.",
+ ex:"A warm, gentle smile when Bappa blesses; a surprised brow raise when the modak plate appears.",
+ try:["At frame 0 neutral, at frame 30 smile, at frame 60 surprised.","Play."],
+ yt:"iClone 8 face key expression"},
+{cat:"face",icon:"🕹️",title:"Face Puppet",where:"Animation → Face Puppet",level:"Intermediate",
+ short:"Perform facial expressions live with the mouse.",
+ more:"Choose expression regions, move the mouse while recording. Feels organic, faster than keying.",
+ ex:"A sly, playful look while Bappa eyes the ladoos.",
+ try:["Open Face Puppet.","Record 3 seconds of eye and brow motion."],
+ yt:"iClone face puppet"},
+{cat:"face",icon:"👁️",title:"Eye animation & blinks",where:"Face Key / Look At / face tab",level:"Beginner",
+ short:"Eyes make or break a performance.",
+ more:"Use Look At for direction, add blinks at natural moments (before a head turn, after a line), and small eye darts.",
+ ex:"Blink just before Bappa turns to look at the devotee — it reads as thoughtful.",
+ try:["Add two blinks in a 5-second shot.","Add one eye dart before a head turn."],
+ yt:"iClone eye blink animation tips"},
+
+/* ---------------- Mocap & AI ---------------- */
+{cat:"mocap",icon:"📡",title:"Motion LIVE (live mocap hub)",where:"Plugins → Motion LIVE",level:"Advanced",
+ short:"Connect mocap suits, gloves and face capture, and record live.",
+ more:"One hub for supported devices (body suits, gloves, iPhone face). Assign each device to body parts and record directly to the timeline.",
+ ex:"Act out Bappa's dance yourself with a mocap suit while an iPhone captures your face.",
+ try:["Open Motion LIVE and see which devices are listed.","Read what each needs (you don't need hardware for this step)."],
+ yt:"iClone Motion LIVE setup tutorial"},
+{cat:"mocap",icon:"📱",title:"Face mocap (AccuFACE / iPhone)",where:"Motion LIVE → face devices",level:"Advanced",
+ short:"Record facial animation from a webcam, video or iPhone.",
+ more:"AccuFACE works from webcam or recorded video; Live Face uses an iPhone's depth camera. Clean up afterwards with Face Key.",
+ ex:"Perform Bappa's dialogue in front of your webcam; your expressions drive his face.",
+ try:["Check which face device options you have.","Record 5 seconds and clean one bad frame."],
+ yt:"iClone AccuFACE webcam facial mocap"},
+{cat:"mocap",icon:"🤖",title:"AI Studio tools",where:"Toolbar: AI STUDIO",level:"Intermediate",
+ short:"Reallusion's AI helpers (video-to-motion, generation features).",
+ more:"Features differ by version and may need credits/points (your toolbar shows 'Available Points'). Explore what's included in your build before relying on it.",
+ ex:"Turn a phone video of a dance into a starting motion for Bappa.",
+ try:["Open AI Studio and list the features available to you.","Check which ones cost points."],
+ yt:"iClone AI Studio video to motion"},
+
+/* ---------------- Timeline ---------------- */
+{cat:"time",icon:"📏",title:"Timeline basics & tracks",where:"Timeline panel (bottom)",level:"Beginner",
+ short:"Each object has tracks: Transform, Motion, Face, Spring, Sound…",
+ more:"Use the track list button to show/hide tracks. Expand a track to see sub-tracks (each body part on the motion layer).",
+ ex:"Expand Motion → Layer to see exactly which bones you've keyed.",
+ try:["Open the track list and show the Spring and Face tracks.","Expand Motion and find the layer sub-tracks."],
+ yt:"iClone 8 timeline tracks beginner"},
+{cat:"time",icon:"🔑",title:"Keys: copy, move, delete",where:"Timeline → right-click keys",level:"Beginner",
+ short:"Shift timing by dragging keys; copy poses to other frames.",
+ more:"Select keys (drag a box), drag to retime, copy/paste to repeat a pose. Delete keys to remove changes.",
+ ex:"The blessing hand is too early — drag its keys 12 frames later.",
+ try:["Make 2 keys, drag them later by 10 frames.","Copy a pose key to the end of the shot."],
+ yt:"iClone 8 keyframe copy paste move"},
+{cat:"time",icon:"〰️",title:"Transition curves & Curve Editor",where:"Right-click key → transition / Plugins → Curve Editor",level:"Intermediate",
+ short:"Control easing: slow-in, slow-out, snappy, bouncy.",
+ more:"Change how motion moves between keys. The Curve Editor shows graphs per channel for detailed polish.",
+ ex:"A punch: slow wind-up, very fast hit, slow settle — that's an ease curve.",
+ try:["Animate a box moving 3 m.","Try linear vs ease-in-out and compare the feel."],
+ yt:"iClone 8 curve editor easing"},
+{cat:"time",icon:"🔊",title:"Sound track",where:"Timeline → Sound track",level:"Beginner",
+ short:"Add music/voice to time animation to sound.",
+ more:"Drop audio onto the project's sound track to animate to the beat or dialogue.",
+ ex:"Time Bappa's dance steps to dhol beats.",
+ try:["Add any music file.","Add a key exactly on a beat you can hear."],
+ yt:"iClone add music audio timeline"},
+{cat:"time",icon:"📦",title:"Collect Clip & Flatten",where:"Timeline: Collect Clip track · right-click motion → Flatten",level:"Intermediate",
+ short:"Save a range as a reusable motion; merge layers into one clip.",
+ more:"Collect Clip marks a range to save into your library. Flatten bakes motion-layer edits into the clip.",
+ ex:"Save 'Bappa_Blessing' as a custom motion and reuse it in 10 scenes.",
+ try:["Mark a 3-second range with Collect Clip.","Save it to Custom motions and apply it to another character."],
+ yt:"iClone collect clip save motion"},
+{cat:"time",icon:"👻",title:"Visible track & Switcher",where:"Timeline: Visible track / Project Switcher",level:"Intermediate",
+ short:"Make things appear/disappear or swap at a frame.",
+ more:"Key visibility off/on (a prop vanishes). The Switcher track swaps between cameras or versions over time.",
+ ex:"A divine flash: a glowing prop appears exactly at frame 120.",
+ try:["Hide a prop at frame 0, show it at frame 60."],
+ yt:"iClone visible track key hide object"},
+
+/* ---------------- Cameras ---------------- */
+{cat:"cam",icon:"🎥",title:"Create & animate a camera",where:"Create → Camera / Camera from view",level:"Beginner",
+ short:"Add a real camera and key its moves.",
+ more:"Look through it, position it, key its transform over time. Keep the viewport camera for working, the real camera for shots.",
+ ex:"Slow push-in from wide to Bappa's face over 5 seconds.",
+ try:["Create a camera from the current view.","Key a wide shot at frame 0 and a close-up at frame 120."],
+ yt:"iClone 8 camera animation tutorial"},
+{cat:"cam",icon:"🔭",title:"Lens / focal length",where:"Select camera → Modify",level:"Beginner",
+ short:"Wide lens exaggerates, long lens flattens.",
+ more:"14–24 mm: dramatic, things near the lens look huge. 35–50 mm: natural. 85 mm+: flattering portraits, flattened depth.",
+ ex:"The big-kick shot: 16 mm right next to the foot.",
+ try:["Same shot at 18 mm, 50 mm and 100 mm — compare the face."],
+ yt:"iClone camera focal length lens"},
+{cat:"cam",icon:"🌫️",title:"Depth of field (DOF)",where:"Camera / Visual settings → DOF",level:"Intermediate",
+ short:"Blur the background to focus attention.",
+ more:"Set focus distance on the subject and adjust blur range. Animate focus to shift attention (rack focus).",
+ ex:"Focus shifts from the diya flame to Bappa's face.",
+ try:["Turn on DOF, focus on the character.","Animate focus to a foreground prop."],
+ yt:"iClone 8 depth of field camera"},
+{cat:"cam",icon:"🎬",title:"Camera switching (multi-cam)",where:"Timeline → camera switch track",level:"Intermediate",
+ short:"Cut between several cameras inside one render.",
+ more:"Place 2–4 cameras, then set which one is active at each frame — like live editing.",
+ ex:"Wide establishing shot → close-up → over-the-shoulder, all in one take.",
+ try:["Make 2 cameras.","Switch from camera 1 to 2 at frame 72."],
+ yt:"iClone camera switch multiple cameras"},
+{cat:"cam",icon:"📌",title:"Camera Look At & follow",where:"Camera → Look At / Attach",level:"Intermediate",
+ short:"Camera always aims at (or rides with) a target.",
+ more:"Look At keeps the subject centred while the camera moves. Attaching a camera to a moving object gives tracking shots.",
+ ex:"Orbit around Bappa while the camera never loses his face.",
+ try:["Set camera Look At to the head.","Move the camera in a half circle and play."],
+ yt:"iClone camera look at target orbit"},
+
+/* ---------------- Lighting & look ---------------- */
+{cat:"light",icon:"💡",title:"Light types",where:"Create → Light (Directional, Spot, Point)",level:"Beginner",
+ short:"Sun-like, flashlight-like, and bulb-like lights.",
+ more:"<b>Directional</b> = sunlight (parallel shadows). <b>Spot</b> = cone of light. <b>Point</b> = bulb in all directions. Use a key light, a soft fill and a rim light.",
+ ex:"Three-point light on Bappa: warm key, soft fill, golden rim to separate him from the background.",
+ try:["Delete all lights, add one spot as key light.","Add a weak fill and a rim behind the character."],
+ yt:"iClone 8 three point lighting"},
+{cat:"light",icon:"🌍",title:"IBL, sky & atmosphere",where:"Visual tab → IBL / Sky / Atmosphere",level:"Intermediate",
+ short:"Image-based light and skies for natural ambient lighting.",
+ more:"IBL lights the scene from an HDR image (soft, realistic). Sky and atmosphere presets set mood fast.",
+ ex:"Sunset HDR for a golden-hour aarti scene.",
+ try:["Load an HDR/IBL preset.","Rotate it and watch the lighting direction change."],
+ yt:"iClone 8 IBL HDR sky lighting"},
+{cat:"light",icon:"✨",title:"Global Illumination (GI)",where:"Visual tab → GI",level:"Advanced",
+ short:"Light bounces off surfaces for realism.",
+ more:"Coloured walls tint nearby objects, rooms feel lit naturally. Costs performance; enable for final looks.",
+ ex:"Light bouncing off a saffron wall warms Bappa's face.",
+ try:["Toggle GI on/off in an indoor scene and compare."],
+ yt:"iClone 8 global illumination GI"},
+{cat:"light",icon:"🎛️",title:"Post effects",where:"Visual tab → Post Effect",level:"Intermediate",
+ short:"Bloom, ambient occlusion, colour grading, LUTs, vignette.",
+ more:"Bloom makes bright things glow, AO adds contact shadows, colour grading/LUT sets the mood, vignette focuses the eye.",
+ ex:"Divine glow: bloom on the halo, warm grade, soft vignette.",
+ try:["Turn on bloom and an emissive prop.","Apply a warm colour grade."],
+ yt:"iClone 8 post effects bloom color grading"},
+{cat:"light",icon:"🖍️",title:"Toon / NPR look",where:"Visual / render toon shader options",level:"Intermediate",
+ short:"Cartoon shading with outlines — perfect for 2D paint-over.",
+ more:"Flat colour bands and outlines make clean reference frames for tracing and painting.",
+ ex:"Render the shot in toon style, then paint over it in Krita or Procreate.",
+ try:["Switch the scene to a toon look.","Render 1 frame and compare with normal shading."],
+ yt:"iClone toon shader outline render"},
+
+/* ---------------- Props & sets ---------------- */
+{cat:"scene",icon:"📦",title:"Props & 3D Blocks",where:"Content → Props (incl. 3D Blocks)",level:"Beginner",
+ short:"Ready objects and basic shapes to build sets.",
+ more:"Cylinders, boxes, spheres, arches — block out sets fast. The Shape Builder plugin in this project builds whole structures from them.",
+ ex:"Block out a pandal with cylinders and boxes before detailed modelling.",
+ try:["Build a simple temple from 5 primitives.","Or run Shape Builder → Build Mansion."],
+ yt:"iClone 8 3D blocks props build set"},
+{cat:"scene",icon:"🏔️",title:"Terrain",where:"Content → Terrain / Nature Terrain Generator",level:"Intermediate",
+ short:"Hills, ground and landscapes.",
+ more:"Load terrains or generate them; paint textures; scale for big outdoor scenes.",
+ ex:"Hills around a riverbank for Ganesh visarjan.",
+ try:["Load a terrain and walk a character on it."],
+ yt:"iClone 8 terrain tutorial"},
+{cat:"scene",icon:"🌳",title:"Trees & plants",where:"Content → Tree / Props nature",level:"Beginner",
+ short:"Natural trees that can sway in the wind.",
+ more:"Native trees (.iTree) support wind; scatter variations for forests. Use fewer, bigger trees in the foreground for performance.",
+ ex:"A banyan tree shading Bappa's shrine.",
+ try:["Add 3 different trees.","Turn up wind and play."],
+ yt:"iClone 8 trees wind nature scene"},
+{cat:"scene",icon:"🌊",title:"Water & sky",where:"Content / Visual → Water, Sky",level:"Intermediate",
+ short:"Lakes, sea and sky domes.",
+ more:"Water planes with waves and reflections; sky domes for backgrounds.",
+ ex:"Visarjan scene: river water with sunset sky.",
+ try:["Add a water plane, adjust waves.","Change the sky preset."],
+ yt:"iClone 8 water sky scene"},
+{cat:"scene",icon:"🔄",title:"Morph props (Morph Animator)",where:"Animation → Morph Animator",level:"Advanced",
+ short:"Animate shape changes on props that have morph targets.",
+ more:"Props with blend shapes (e.g. Bouncing Ball in Morph Props) can be keyed between shapes over time.",
+ ex:"A lotus that opens its petals when Bappa appears.",
+ try:["Load Props → Morph Props → Bouncing Ball.","Open Morph Animator and key a shape."],
+ yt:"iClone morph animator prop"},
+
+/* ---------------- Physics & FX ---------------- */
+{cat:"fx",icon:"🧱",title:"Rigid body physics",where:"Modify → Physics tab (atom icon)",level:"Intermediate",
+ short:"Objects fall, bounce and collide.",
+ more:"Set an object as rigid body (dynamic or static), choose a collision shape, press play. Check in By Frame playback.",
+ ex:"Modaks tumbling off a plate when the mouse bumps it.",
+ try:["Add a box above the floor, enable rigid body.","Play — it falls and bounces."],
+ yt:"iClone 8 rigid body physics"},
+{cat:"fx",icon:"👗",title:"Soft cloth",where:"Modify → Physics → soft cloth + weight map",level:"Advanced",
+ short:"Clothes and fabric that flow.",
+ more:"Paint a weight map (black = follow body, white = free). Collides only with simple capsule shapes; for exact body collision use Blender.",
+ ex:"Bappa's dupatta flowing in the wind; tight dhoti waist stays pinned.",
+ try:["Enable cloth on a skirt or cape.","Paint the waist black and play a walk."],
+ yt:"iClone 8 soft cloth weight map"},
+{cat:"fx",icon:"🛡️",title:"Collision shapes",where:"CC4 → Modify → Physics → Edit Collision Shape",level:"Advanced",
+ short:"Capsules/spheres on bones that cloth bumps into.",
+ more:"Add more and smaller shapes along curved areas (belly, chest, thighs) for a better fit. Save the setup to reuse.",
+ ex:"A sphere on Bappa's belly so the dhoti doesn't sink into it.",
+ try:["Open Edit Collision Shape in CC4.","Add a sphere on the belly and resize it to sit just inside the skin."],
+ yt:"character creator 4 edit collision shape"},
+{cat:"fx",icon:"🔗",title:"Constraints",where:"Physics → constraints",level:"Advanced",
+ short:"Hinges, chains and joints between physics objects.",
+ more:"Connect rigid bodies with hinges or point joints for swinging, dangling and chained motion.",
+ ex:"A temple bell swinging on its hinge when struck.",
+ try:["Hang a box on a hinge constraint.","Push it and watch it swing."],
+ yt:"iClone physics constraint hinge"},
+{cat:"fx",icon:"🔥",title:"Particles",where:"Create / Content → Particle",level:"Intermediate",
+ short:"Fire, smoke, sparks, rain, petals.",
+ more:"Load particle emitters and tune rate, size, colour, lifetime. Attach to objects to move them.",
+ ex:"Flower petals raining on Bappa; diya flames flickering.",
+ try:["Add a fire particle to a diya prop.","Add falling petals and slow them down."],
+ yt:"iClone 8 particles fire smoke petals"},
+{cat:"fx",icon:"🌬️",title:"Wind & gravity",where:"Physics settings / Visual",level:"Intermediate",
+ short:"Global forces for cloth, trees and particles.",
+ more:"Wind direction/strength affects cloth, trees and particles. Gravity and simulation settings live in project physics settings.",
+ ex:"A gust as Bappa appears: trees bend, clothes flutter, petals swirl.",
+ try:["Increase wind strength and watch cloth and trees."],
+ yt:"iClone wind force cloth trees"},
+
+/* ---------------- Render ---------------- */
+{cat:"render",icon:"🎞️",title:"Render video or image sequence",where:"Render tab / Render menu",level:"Beginner",
+ short:"Export MP4 or numbered PNG frames.",
+ more:"For paint-over, render a PNG <b>image sequence</b> (easy to import frame by frame into Krita/Procreate). Pick the active camera, size and frame range.",
+ ex:"Shot01 at 1920×1080, 24 fps, PNG frames 0–240.",
+ try:["Render 2 seconds as an image sequence.","Open the folder and check the numbered frames."],
+ yt:"iClone 8 render image sequence png"},
+{cat:"render",icon:"🎚️",title:"Render settings & quality",where:"Render panel → quality / anti-aliasing",level:"Intermediate",
+ short:"Resolution, super-sampling, motion blur, alpha.",
+ more:"Higher anti-aliasing = smoother edges, slower. Motion blur for live-action feel (turn OFF for paint-over references). Alpha channel for transparent backgrounds.",
+ ex:"Render Bappa on transparent background to composite him over a painted sky.",
+ try:["Render one frame with alpha.","Compare low vs high anti-aliasing."],
+ yt:"iClone 8 render settings alpha motion blur"},
+{cat:"render",icon:"🖌️",title:"Render passes for 2D paint-over",where:"Render options (toon, outline, depth where available)",level:"Advanced",
+ short:"Separate passes make tracing and painting easier.",
+ more:"A flat/toon pass for shapes, an outline pass for lines, and depth for atmosphere. Render at 24 fps, paint on 2s (every 2nd frame), use 1s for fast action.",
+ ex:"Kick shot: ones during the kick, twos everywhere else.",
+ try:["Render the same 2 seconds as normal and as toon.","Paint over 3 frames to test the workflow."],
+ yt:"3D to 2D paint over workflow animation"},
+
+/* ---------------- Pipeline ---------------- */
+{cat:"pipe",icon:"🐍",title:"Python scripts & plugins",where:"Script → Load Python · Plugins menu",level:"Advanced",
+ short:"Automate iClone and add your own tools.",
+ more:"This project already has: <b>Jiggle Baker</b> (breast/chain bounce as keys) and <b>Shape Builder</b> (structures from primitives). Load them with Script → Load Python.",
+ ex:"Click once → whole mansion built from cylinders and domes.",
+ try:["Load iclone_jiggle_baker/main.py and click Check API.","Load iclone_shape_builder/main.py and build the mansion."],
+ yt:"iClone python script plugin tutorial"},
+{cat:"pipe",icon:"🟦",title:"To Blender (CC Blender Tools)",where:"Export FBX + free CC/iC Blender Tools add-on",level:"Advanced",
+ short:"Send characters and animation to Blender with materials set up.",
+ more:"The community add-on imports CC/iClone exports with proper materials and supports physics/spring workflows. Use Blender for cloth, mesh collisions and final renders.",
+ ex:"Simulate Bappa's silk dhoti in Blender with true body collision.",
+ try:["Install CC Blender Tools in Blender.","Import an exported iClone character."],
+ yt:"CC Blender Tools iClone import"},
+{cat:"pipe",icon:"🟪",title:"To Unreal (Live Link / Auto Setup)",where:"Plugins → Unreal Live Link",level:"Advanced",
+ short:"Animate in iClone, see it live in Unreal.",
+ more:"Live Link streams characters, lights and cameras to Unreal Engine for real-time cinematic rendering.",
+ ex:"Animate in iClone; Unreal renders a lush temple environment in real time.",
+ try:["Read the Live Link requirements for your Unreal version."],
+ yt:"iClone unreal live link tutorial"}
+];
+
+/* ---------------- app ---------------- */
+const $ = s => document.querySelector(s);
+/* Progress is saved in the browser when allowed; otherwise it lasts until the tab closes. */
+let canStore = true, store = {};
+try { store = JSON.parse(localStorage.getItem("ic8guide") || "{}"); } catch (e) { canStore = false; }
+store.done = store.done || {}; store.steps = store.steps || {};
+const save = () => { if (canStore) try { localStorage.setItem("ic8guide", JSON.stringify(store)); } catch (e) {} };
+let filter = "all", query = "";
+
+F.forEach((f,i)=> f.id = f.cat + "_" + i);
+
+function ytLink(q){
+  return "https://www.youtube.com/results?search_query=" + encodeURIComponent(q + " -reallusion");
+}
+function matches(f){
+  if (filter === "todo" && store.done[f.id]) return false;
+  if (["Beginner","Intermediate","Advanced"].includes(filter) && f.level !== filter) return false;
+  if (!query) return true;
+  const hay = (f.title+" "+f.where+" "+f.short+" "+f.more+" "+f.ex+" "+f.try.join(" ")).toLowerCase();
+  return query.split(/\s+/).every(w => hay.includes(w));
+}
+function card(f){
+  const d = store.done[f.id] ? " done" : "";
+  const steps = f.try.map((s,j)=>{
+    const k = f.id+"_"+j;
+    return `<li data-k="${k}" class="${store.steps[k]?'ok':''}">${s}</li>`;
+  }).join("");
+  return `<div class="card${d}" id="${f.id}">
+    <div class="top"><div class="ico">${f.icon}</div>
+      <div class="ttl"><h3>${f.title}</h3><div class="where">${f.where}</div></div>
+      <span class="lvl ${f.level}">${f.level}</span></div>
+    <p class="short">${f.short}</p>
+    <div class="btns">
+      <button data-t="more">💡 Explain</button>
+      <button data-t="try">🛠️ Try it</button>
+      <a class="yt" href="${ytLink(f.yt)}" target="_blank" rel="noopener">▶ Tutorials</a>
+      <label><input type="checkbox" ${store.done[f.id]?"checked":""} data-done="${f.id}"> learned</label>
+    </div>
+    <div class="more">${f.more}<div class="ex">🐘 <b>Example:</b> ${f.ex}</div></div>
+    <div class="try"><span class="goal">Practice (click a step when done):</span><ol>${steps}</ol></div>
+  </div>`;
+}
+function render(){
+  let html = "";
+  CATS.forEach(([id,icon,name])=>{
+    const items = F.filter(f=>f.cat===id && matches(f));
+    if (!items.length) return;
+    html += `<h2 class="cat" id="cat_${id}">${icon} ${name} <small>${items.length} topics</small></h2><div class="grid">${items.map(card).join("")}</div>`;
+  });
+  if (!html) html = `<div class="empty">Nothing matches “${query}”. Ask Claude about it!</div>`;
+  $("#content").innerHTML = intro() + html;
+  stats();
+}
+function stats(){
+  $("#nav").innerHTML = CATS.map(([id,icon,name])=>{
+    const all = F.filter(f=>f.cat===id);
+    const done = all.filter(f=>store.done[f.id]).length;
+    return `<a data-go="${id}"><span>${icon} ${name}</span><small>${done}/${all.length}</small></a>`;
+  }).join("");
+  const n = Object.values(store.done).filter(Boolean).length;
+  $("#barfill").style.width = (100*n/F.length)+"%";
+  $("#ptext").textContent = `${n} / ${F.length} learned`;
+}
+function intro(){
+  if (query || filter!=="all") return "";
+  return `<div class="intro"><b>How to use:</b> each card is one iClone 8 feature.
+  <b>💡 Explain</b> opens the details and an example, <b>🛠️ Try it</b> gives a short practice task, and
+  <b>▶ Tutorials</b> searches YouTube (Reallusion's own channel is filtered out).
+  Tick <b>learned</b> to track progress; it's saved in this browser. Press <kbd>/</kbd> to search.
+  Menu names can differ slightly between iClone 8 updates. If something doesn't match your screen, ask Claude.</div>`;
+}
+
+document.addEventListener("click", e=>{
+  const t = e.target;
+  if (t.dataset.t){ t.closest(".card").querySelector("."+t.dataset.t).classList.toggle("open"); }
+  if (t.tagName==="LI" && t.dataset.k){ store.steps[t.dataset.k]=!store.steps[t.dataset.k]; t.classList.toggle("ok"); save(); }
+  if (t.closest("[data-go]")){ const el = document.getElementById("cat_"+t.closest("[data-go]").dataset.go); if(el) el.scrollIntoView({behavior:"smooth"}); }
+  if (t.classList.contains("chip") && t.dataset.f){
+    document.querySelectorAll(".chip[data-f]").forEach(c=>c.classList.remove("on"));
+    t.classList.add("on"); filter = t.dataset.f; render();
+  }
+});
+document.addEventListener("change", e=>{
+  if (e.target.dataset.done){
+    store.done[e.target.dataset.done]=e.target.checked; save();
+    if (filter==="todo") return render();
+    e.target.closest(".card").classList.toggle("done", e.target.checked);
+    stats();
+  }
+});
+$("#search").addEventListener("input", e=>{ query = e.target.value.trim().toLowerCase(); render(); });
+document.addEventListener("keydown", e=>{ if(e.key==="/" && document.activeElement!==$("#search")){ e.preventDefault(); $("#search").focus(); }});
+$("#theme").onclick = ()=>{ document.body.classList.toggle("light"); store.light=document.body.classList.contains("light"); save(); };
+if (store.light) document.body.classList.add("light");
+render();
+</script>
+</body>
+</html>
