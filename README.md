@@ -1,10 +1,14 @@
-# iClone 8 Field Guide
+# iClone 8 & Character Creator 4 Field Guides
 
-An interactive, single-page guide to iClone 8 features. Open `index.html` in any browser; it needs no install or internet connection, except for the YouTube links.
+Two interactive guides you can open in any browser. They need no install or internet connection, except for the YouTube links.
 
-- **73 topics** in 13 sections: interface, project, characters, body animation, face and lip sync, mocap and AI, timeline, cameras, lighting, sets, physics, rendering, and pipeline.
-- Each topic has a one-line summary, an **💡 Explain** toggle with details and an example, a **🛠️ Try it** practice task, and **▶ Tutorials** (a YouTube search that excludes Reallusion's own channel).
-- **Learned** checkboxes and a progress bar track what you've covered. They're saved in your browser.
-- Search with the `/` key, and filter by level or by topics not yet done.
+| Page | Covers |
+|---|---|
+| `index.html` | **iClone 8**: 73 topics in 13 sections (interface, characters, body and face animation, mocap, timeline, cameras, lighting, sets, physics, rendering, pipeline) |
+| `cc4.html` | **Character Creator 4**: 47 topics in 11 sections (body and head creation, skin, hair, clothes, expressions, rigging, springs and physics, mesh tools, export) |
 
-Menu names can differ slightly between iClone 8.x updates.
+Each topic has a one-line summary, an **💡 Explain** toggle with details and an example, a **🛠️ Try it** practice task, and **▶ Tutorials** (a YouTube search that excludes Reallusion's own channel).
+
+**Learned** checkboxes and a progress bar track what you've covered; they're saved in your browser, separately for each guide. Search with the `/` key, filter by level or by topics not yet done, and switch between the guides using the link in the header.
+
+Both pages share `assets/guide.css` and `assets/guide.js`, so keep the `assets` folder next to them. Menu names can differ slightly between versions.
